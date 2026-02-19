@@ -34,6 +34,7 @@ DateOfBirth = Yernar(1)
 print(DateOfBirth(13))
 
 
+
 def myfunc(n):
     return lambda a : a * n
 
@@ -41,12 +42,16 @@ mydoubler = myfunc(3)
 
 print(mydoubler(2))
 
+
+
 def myfunc(n):
     return lambda a : a * n
 
 mydoubler = myfunc(2)
 
 print(mydoubler(11))
+
+
 
 def myfunc(n):
     return lambda a : a * n
