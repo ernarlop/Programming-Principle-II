@@ -9,17 +9,17 @@ current_time = datetime.datetime.now().time()     # current time only
 print("Now (local):", now_local)
 print("Today:", today)
 print("Time:", current_time)
-print()
+
 
 # Creating Date Objects
 d = datetime.date(2026, 2, 26)                    # date object: year, month, day
-dt = datetime.datetime(2026, 2, 26, 14, 30)       # datetime object: date + time
+dt = datetime.datetime(2026, 2, 26, 14, 00)       # datetime object: date + time
 t = datetime.time(9, 15, 0)                       # time object: hour, minute, second
 
 print("Date:", d)
 print("Datetime:", dt)
 print("Time:", t)
-print()
+
 
 # Date Formatting (strftime)
 
@@ -28,7 +28,7 @@ dt_now = datetime.datetime.now()                  # current datetime
 print("Format YYYY-MM-DD:", dt_now.strftime("%Y-%m-%d"))
 print("Format DD/MM/YYYY HH:MM:", dt_now.strftime("%d/%m/%Y %H:%M"))
 print("Format Weekday, Month Day:", dt_now.strftime("%A, %B %d"))
-print()
+
 
 # Calculating Time Differences
 
@@ -41,7 +41,7 @@ print("Timedelta:", diff)
 print("Days:", diff.days)
 print("Total seconds:", diff.total_seconds())
 print("Hours:", diff.total_seconds() / 3600)
-print()
+
 
 # Working with Timezones
 
@@ -54,7 +54,6 @@ print("KZ time (+06:00):", kz_time)
 
 local_time = datetime.datetime.now().astimezone() # local time with timezone info
 print("Local time:", local_time)
-
 
 
 # #%a	Weekday, short version	                        Wed	
