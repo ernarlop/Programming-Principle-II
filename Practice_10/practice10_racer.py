@@ -1,14 +1,3 @@
-"""
-Practice 10 - Racer Game
-Features:
-  - Enemy cars moving down the road
-  - Player car moving left/right
-  - Randomly appearing coins on the road
-  - Coin counter displayed in the top right corner
-  - Score counter in the top left
-  - Speed increases over time
-"""
-
 import pygame, sys, random, time
 from pygame.locals import *
 

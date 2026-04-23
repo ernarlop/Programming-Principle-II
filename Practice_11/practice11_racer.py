@@ -1,11 +1,3 @@
-"""
-Practice 11 – Racer Game  (extends Practice 10)
-New features:
-  1. Coins with different weights (values) – Bronze=1, Silver=3, Gold=5
-  2. Enemy speed increases every N coins collected
-  3. Fully commented code
-"""
-
 import pygame, sys, random, time
 from pygame.locals import *
 

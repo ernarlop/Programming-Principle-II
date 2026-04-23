@@ -1,11 +1,3 @@
-"""
-Practice 11 – Snake Game  (extends Practice 10)
-New features:
-  1. Food with different weights (values): Common=10pts, Rare=30pts, Legendary=50pts
-  2. Food disappears after a countdown timer if not eaten in time
-  3. Fully commented code
-"""
-
 import pygame, sys, random, time as pytime
 from pygame.locals import *
 

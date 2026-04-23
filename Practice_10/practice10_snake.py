@@ -1,14 +1,3 @@
-"""
-Practice 10 – Snake Game
-Features:
-  1. Border (wall) collision detection – game over if snake leaves the area
-  2. Food never spawns on a wall or on the snake body
-  3. Level system – level up every 4 foods eaten
-  4. Speed increases with each level
-  5. Score and Level counter displayed on screen
-  6. Code is fully commented
-"""
-
 import pygame, sys, random
 from pygame.locals import *
 
