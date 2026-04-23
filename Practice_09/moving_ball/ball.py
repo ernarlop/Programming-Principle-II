@@ -9,7 +9,7 @@ def run_ball_game():
     height = 600
     step = 20
     radius = 25
-    move_speed = 320  # pixels per second (for smooth animation)
+    move_speed = 320  
 
     screen = pygame.display.set_mode((width, height))
     clock = pygame.time.Clock()
@@ -51,11 +51,11 @@ def run_ball_game():
                     next_x = start_x + dx
                     next_y = start_y + dy
 
-                    # Ignore input that goes out of screen.
+    
                     if in_bounds(next_x, next_y):
                         move_queue.append((next_x, next_y))
 
-        # Smoothly move to next queued target.
+       
         if move_queue:
             target_x, target_y = move_queue[0]
             diff_x = target_x - x

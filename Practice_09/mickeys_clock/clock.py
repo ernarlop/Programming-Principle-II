@@ -39,7 +39,7 @@ class MickeyClockApp:
             minute = now.minute
             second = now.second
 
-            # 360/60 = 6 degrees per step
+            
             self.minute_angle = minute * 6 + second * 0.1
             self.second_angle = second * 6
             self.time_text = f"{minute:02d}:{second:02d}"
@@ -48,7 +48,7 @@ class MickeyClockApp:
         rotated_hand = pygame.transform.rotate(self.hand_image, -angle)
         hand_rect = rotated_hand.get_rect(center=pivot_pos)
         self.screen.blit(rotated_hand, hand_rect)
-
+    
     def draw_gradient_background(self):
         top_color = (12, 24, 62)
         bottom_color = (38, 74, 134)
@@ -80,7 +80,6 @@ class MickeyClockApp:
         pygame.draw.circle(self.screen, (229, 233, 244), (cx, cy), 70)
         pygame.draw.circle(self.screen, (45, 57, 87), (cx, cy), 8)
 
-        # Draw marks around dial
         for index in range(60):
             angle = math.radians(index * 6 - 90)
             outer_x = cx + int(math.cos(angle) * 66)

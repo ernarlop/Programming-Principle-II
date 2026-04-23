@@ -166,7 +166,7 @@ def delete_contact():
     conn.close()
     print("Contact deleted.")
 
-    
+
 def menu():
     while True:
         print("\n--- PHONEBOOK MENU ---")

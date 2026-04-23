@@ -11,7 +11,7 @@ def setup_database():
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(50) NOT NULL,
                 surname VARCHAR(50) NOT NULL,
-                phone VARCHAR(20) NOT NULL,
+                phone VARCHAR(20) UNIQUE NOT NULL,
                 CONSTRAINT unique_name_surname UNIQUE (name, surname)
             );
         """)
