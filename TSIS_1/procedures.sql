@@ -1,124 +1,107 @@
-CREATE OR REPLACE FUNCTION _resolve_contact_id(p_contact_name VARCHAR)
-RETURNS INT
-LANGUAGE plpgsql
-AS $$
-DECLARE
-    v_name TEXT := REGEXP_REPLACE(TRIM(COALESCE(p_contact_name, '')), E'\\s+', ' ', 'g');
-    v_first_name TEXT;
-    v_surname TEXT;
-    v_contact_id INT;
-    v_count INT;
-BEGIN
-    IF v_name = '' THEN
-        RAISE EXCEPTION 'contact name cannot be empty';
-    END IF;
-
-    IF POSITION(' ' IN v_name) > 0 THEN
-        v_first_name := SPLIT_PART(v_name, ' ', 1);
-        v_surname := TRIM(SUBSTRING(v_name FROM LENGTH(v_first_name) + 1));
-
-        SELECT c.id
-        INTO v_contact_id
-        FROM contacts AS c
-        WHERE LOWER(c.first_name) = LOWER(v_first_name)
-          AND LOWER(c.surname) = LOWER(v_surname)
-        LIMIT 1;
-
-        IF v_contact_id IS NULL THEN
-            RAISE EXCEPTION 'contact not found: %', v_name;
-        END IF;
-
-        RETURN v_contact_id;
-    END IF;
-
-    SELECT COUNT(*), MIN(c.id)
-    INTO v_count, v_contact_id
-    FROM contacts AS c
-    WHERE LOWER(c.first_name) = LOWER(v_name);
-
-    IF v_count = 0 THEN
-        RAISE EXCEPTION 'contact not found: %', v_name;
-    END IF;
-
-    IF v_count > 1 THEN
-        RAISE EXCEPTION 'multiple contacts with first name %, use full name', v_name;
-    END IF;
-
-    RETURN v_contact_id;
-END;
-$$;
-
-
+-- ── 1. add_phone 
+-- Adds a phone number to an existing contact (looked up by full name).
 CREATE OR REPLACE PROCEDURE add_phone(
-    IN p_contact_name VARCHAR,
-    IN p_phone VARCHAR,
-    IN p_type VARCHAR
+    p_contact_name VARCHAR,   -- "First Last"
+    p_phone        VARCHAR,
+    p_type         VARCHAR    -- home, work, mobile
 )
-LANGUAGE plpgsql
-AS $$
+LANGUAGE plpgsql AS $$
 DECLARE
-    v_contact_id INT;
-    v_phone TEXT := TRIM(COALESCE(p_phone, ''));
-    v_type TEXT := LOWER(TRIM(COALESCE(p_type, '')));
+    v_id INT;
 BEGIN
-    IF v_phone = '' THEN
-        RAISE EXCEPTION 'phone cannot be empty';
+    SELECT id INTO v_id
+    FROM   contacts
+    WHERE  LOWER(first_name || ' ' || last_name) = LOWER(TRIM(p_contact_name))
+    LIMIT  1;
+
+    IF v_id IS NULL THEN
+        RAISE EXCEPTION 'Contact "%" not found.', p_contact_name;
     END IF;
 
-    IF v_phone !~ E'^\\+?[0-9][0-9\\-\\s]{3,31}$' THEN
-        RAISE EXCEPTION 'invalid phone format: %', v_phone;
+    IF p_type NOT IN ('home', 'work', 'mobile') THEN
+        RAISE EXCEPTION 'Invalid phone type "%". Use home | work | mobile.', p_type;
     END IF;
-
-    IF v_type NOT IN ('home', 'work', 'mobile') THEN
-        RAISE EXCEPTION 'phone type must be home, work, or mobile';
-    END IF;
-
-    v_contact_id := _resolve_contact_id(p_contact_name);
 
     INSERT INTO phones (contact_id, phone, type)
-    VALUES (v_contact_id, v_phone, v_type)
-    ON CONFLICT (contact_id, phone)
-    DO UPDATE SET type = EXCLUDED.type;
-
-    UPDATE contacts
-    SET phone = v_phone
-    WHERE id = v_contact_id
-      AND (phone IS NULL OR TRIM(phone) = '');
+    VALUES (v_id, TRIM(p_phone), p_type);
 END;
 $$;
 
 
+-- 2. move_to_group 
+-- Moves a contact to the specified group; creates the group if missing.
 CREATE OR REPLACE PROCEDURE move_to_group(
-    IN p_contact_name VARCHAR,
-    IN p_group_name VARCHAR
+    p_contact_name VARCHAR,
+    p_group_name   VARCHAR
 )
-LANGUAGE plpgsql
-AS $$
+LANGUAGE plpgsql AS $$
 DECLARE
     v_contact_id INT;
-    v_group_name TEXT := TRIM(COALESCE(p_group_name, ''));
-    v_group_id INT;
+    v_group_id   INT;
 BEGIN
-    IF v_group_name = '' THEN
-        RAISE EXCEPTION 'group name cannot be empty';
-    END IF;
-
-    v_contact_id := _resolve_contact_id(p_contact_name);
-
-    SELECT g.id
-    INTO v_group_id
-    FROM groups AS g
-    WHERE LOWER(g.name) = LOWER(v_group_name)
-    LIMIT 1;
+    -- Resolve (or create) the group
+    SELECT id INTO v_group_id
+    FROM   groups
+    WHERE  LOWER(name) = LOWER(TRIM(p_group_name));
 
     IF v_group_id IS NULL THEN
         INSERT INTO groups (name)
-        VALUES (INITCAP(v_group_name))
+        VALUES (INITCAP(TRIM(p_group_name)))
         RETURNING id INTO v_group_id;
     END IF;
 
+    -- Resolve the contact
+    SELECT id INTO v_contact_id
+    FROM   contacts
+    WHERE  LOWER(first_name || ' ' || last_name) = LOWER(TRIM(p_contact_name))
+    LIMIT  1;
+
+    IF v_contact_id IS NULL THEN
+        RAISE EXCEPTION 'Contact "%" not found.', p_contact_name;
+    END IF;
+
     UPDATE contacts
-    SET group_id = v_group_id
-    WHERE id = v_contact_id;
+    SET    group_id = v_group_id
+    WHERE  id = v_contact_id;
+END;
+$$;
+
+
+-- 3. search_contacts 
+-- Full-text pattern search across name, email, and all phone numbers.
+CREATE OR REPLACE FUNCTION search_contacts(p_query TEXT)
+RETURNS TABLE (
+    id         INT,
+    first_name VARCHAR,
+    last_name  VARCHAR,
+    email      VARCHAR,
+    birthday   DATE,
+    group_name VARCHAR,
+    phones     TEXT          -- comma-separated "number (type)"
+)
+LANGUAGE plpgsql AS $$
+DECLARE
+    v_pattern TEXT := '%' || LOWER(TRIM(p_query)) || '%';
+BEGIN
+    RETURN QUERY
+    SELECT DISTINCT
+           c.id,
+           c.first_name,
+           c.last_name,
+           c.email,
+           c.birthday,
+           g.name AS group_name,
+           STRING_AGG(p.phone || ' (' || p.type || ')', ', '
+                      ORDER BY p.type) AS phones
+    FROM   contacts c
+    LEFT JOIN groups g ON g.id   = c.group_id
+    LEFT JOIN phones p ON p.contact_id = c.id
+    WHERE  LOWER(c.first_name)                    LIKE v_pattern
+        OR LOWER(c.last_name)                     LIKE v_pattern
+        OR LOWER(c.first_name || ' ' || c.last_name) LIKE v_pattern
+        OR LOWER(COALESCE(c.email, ''))           LIKE v_pattern
+        OR LOWER(COALESCE(p.phone, ''))           LIKE v_pattern
+    GROUP BY c.id, c.first_name, c.last_name, c.email, c.birthday, g.name
+    ORDER BY c.last_name, c.first_name;
 END;
 $$;
