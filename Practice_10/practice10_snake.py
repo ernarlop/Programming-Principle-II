@@ -24,7 +24,7 @@ BLACK      = (0,   0,   0)
 WHITE      = (255, 255, 255)
 GREEN      = (50,  200, 50)
 DARK_GREEN = (30,  130, 30)
-RED        = (220, 50,  50)
+RED        = (220, 50,  255)
 GRAY       = (40,  40,  40)
 WALL_COLOR = (80,  80,  80)
 GOLD       = (255, 215, 0)
@@ -152,13 +152,13 @@ while running:
 
         # Arrow key input – prevent reversing direction
         if event.type == KEYDOWN:
-            if event.key == K_UP    and direction != DOWN:
+            if event.key == K_w    and direction != DOWN:
                 next_direction = UP
-            elif event.key == K_DOWN  and direction != UP:
+            elif event.key == K_s  and direction != UP:
                 next_direction = DOWN
-            elif event.key == K_LEFT  and direction != RIGHT:
+            elif event.key == K_a  and direction != RIGHT:
                 next_direction = LEFT
-            elif event.key == K_RIGHT and direction != LEFT:
+            elif event.key == K_d and direction != LEFT:
                 next_direction = RIGHT
 
         # Snake movement driven by a timed event
@@ -168,13 +168,13 @@ while running:
             dc, dr         = direction
             new_head       = (head_c + dc, head_r + dr)
 
-            # ── Wall collision ──
+            #  Wall collision 
             if is_wall(*new_head):
                 game_over_screen(score, level)
                 running = False
                 break
 
-            # ── Self collision ──
+            #  Self collision
             if new_head in snake[1:]:
                 game_over_screen(score, level)
                 running = False
@@ -183,7 +183,7 @@ while running:
             # Move snake: prepend new head 
             snake.insert(0, new_head)
 
-            # Food eaten?
+            # Food eaten
             if new_head == food:
                 score       += 10 * level          # more points at higher levels
                 foods_eaten += 1

@@ -128,19 +128,20 @@ class Coin(pygame.sprite.Sprite):
 P1 = Player()
 E1 = Enemy()
 
+
 # Three coins visible on screen at start
 coins = pygame.sprite.Group()
 for _ in range(3):
     coins.add(Coin())
 
 enemies    = pygame.sprite.Group(E1)
-all_sprites = pygame.sprite.Group(P1, E1)
+all_sprites = pygame.sprite.Group(P1, E1, )
 
 # Custom events 
-INC_SPEED  = pygame.USEREVENT + 1
+#INC_SPEED  = pygame.USEREVENT + 1
 SPAWN_COIN = pygame.USEREVENT + 2
-pygame.time.set_timer(INC_SPEED,  1000)   # increase speed every second
-pygame.time.set_timer(SPAWN_COIN, 4000)   # spawn an extra coin every 4 s
+# pygame.time.set_timer(INC_SPEED,  1000)   # increase speed every second
+pygame.time.set_timer(SPAWN_COIN, 5000)   # spawn an extra coin every 5 s
 
 # Main game loop 
 while True:
@@ -149,8 +150,7 @@ while True:
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == INC_SPEED:
-            SPEED += 0.5                   # gradually get harder
+                  # gradually get harder
         if event.type == SPAWN_COIN:
             coins.add(Coin())              # add a new random coin
 
