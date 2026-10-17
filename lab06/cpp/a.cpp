@@ -1,7 +1,19 @@
 #include <bits/stdc++.h>
 using namespace std;
+
 int main() {
-    int n, c[26] = {}; string s; cin >> n >> s;
-    for (char ch : s) c[ch - 'a']++; // сортировка подсчётом
-    for (char ch : string("aeioubcdfghjklmnpqrstvwxyz")) cout << string(c[ch - 'a'], ch); // алфавит Альберта
+    int n;
+    string s;
+    cin >> n >> s;
+
+    // count how many times each letter appears
+    int cnt[26] = {0};
+    for (char c : s)
+        cnt[c - 'a']++;
+
+    // Albert's alphabet: vowels first, then consonants
+    string order = "aeioubcdfghjklmnpqrstvwxyz";
+    for (char c : order)
+        for (int i = 0; i < cnt[c - 'a']; i++)
+            cout << c;
 }

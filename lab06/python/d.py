@@ -1,3 +1,14 @@
-v = [input() for _ in range(int(input()))]
-v.sort(key=lambda s: (s[6:], s[3:5], s[:2]))  # год, месяц, день
-print("\n".join(v))
+# "DD-MM-YYYY" -> "YYYYMMDD", then simple string comparison sorts by date
+def key(s):
+    return s[6:10] + s[3:5] + s[0:2]
+
+
+n = int(input())
+dates = []
+for _ in range(n):
+    dates.append(input().strip())
+
+dates.sort(key=key)
+
+for d in dates:
+    print(d)

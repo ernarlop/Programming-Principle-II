@@ -1,11 +1,26 @@
-# Сортировка слиянием: всегда O(n log n). Делим пополам, сортируем половины, сливаем.
+# Merge sort, always O(n log n): split in half, sort both halves, merge them
 def merge_sort(a):
-    if len(a) <= 1: return a
-    L, R = merge_sort(a[:len(a) // 2]), merge_sort(a[len(a) // 2:])
-    res, i, j = [], 0, 0
-    while i < len(L) and j < len(R):  # берём меньший из двух "голов"
-        if L[i] <= R[j]: res.append(L[i]); i += 1
-        else: res.append(R[j]); j += 1
-    return res + L[i:] + R[j:]
+    if len(a) <= 1:
+        return a
+    mid = len(a) // 2
+    left = merge_sort(a[:mid])
+    right = merge_sort(a[mid:])
 
-input(); print(*merge_sort(list(map(int, input().split()))))
+    # merge the two sorted halves
+    res = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            res.append(left[i])
+            i += 1
+        else:
+            res.append(right[j])
+            j += 1
+    res += left[i:]   # leftovers of the left half
+    res += right[j:]  # leftovers of the right half
+    return res
+
+
+n = int(input())
+a = list(map(int, input().split()))
+print(*merge_sort(a))
