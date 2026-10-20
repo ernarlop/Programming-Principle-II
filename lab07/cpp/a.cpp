@@ -2,18 +2,20 @@
 using namespace std;
 
 int main() {
-    ios::sync_with_stdio(0); cin.tie(0);
     int t;
     cin >> t;
-    string line;
-    getline(cin, line); // finish the first line
 
     while (t--) {
-        getline(cin, line);
-        stringstream ss(line);
+        // read the words of one line: after each word look at the next character,
+        // if it is the end of the line - this set is finished
         vector<string> w;
         string s;
-        while (ss >> s) w.push_back(s);
+        while (true) {
+            cin >> s;
+            w.push_back(s);
+            while (cin.peek() == ' ') cin.get(); // skip spaces
+            if (cin.peek() == '\n' || cin.peek() == '\r' || cin.peek() == EOF) break;
+        }
 
         // min-heap of (length, position):
         // shorter words come out first; equal length -> the one that was earlier (stable)
