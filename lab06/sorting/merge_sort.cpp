@@ -1,21 +1,33 @@
 #include <bits/stdc++.h>
 using namespace std;
-// Сортировка слиянием: всегда O(n log n). Делим пополам, сортируем половины, сливаем.
-vector<int> a, t;
-void merge_sort(int l, int r) { // сортирует a[l..r]
+
+// Merge sort, always O(n log n): split in half, sort both halves, merge them
+vector<int> a;
+
+void merge_sort(int l, int r) { // sorts a[l..r]
     if (l >= r) return;
     int m = (l + r) / 2;
     merge_sort(l, m);
     merge_sort(m + 1, r);
-    int i = l, j = m + 1, k = l;
-    while (i <= m || j <= r) // берём меньший из двух "голов"
-        t[k++] = (j > r || (i <= m && a[i] <= a[j])) ? a[i++] : a[j++];
-    for (k = l; k <= r; k++) a[k] = t[k];
+
+    // merge the sorted halves a[l..m] and a[m+1..r]
+    vector<int> t;
+    int i = l, j = m + 1;
+    while (i <= m && j <= r) {
+        if (a[i] <= a[j]) t.push_back(a[i++]);
+        else t.push_back(a[j++]);
+    }
+    while (i <= m) t.push_back(a[i++]); // leftovers of the left half
+    while (j <= r) t.push_back(a[j++]); // leftovers of the right half
+
+    for (int k = 0; k < (int)t.size(); k++) a[l + k] = t[k];
 }
+
 int main() {
-    int n; cin >> n;
-    a.resize(n); t.resize(n);
-    for (int& x : a) cin >> x;
+    int n;
+    cin >> n;
+    a.resize(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
     merge_sort(0, n - 1);
-    for (int x : a) cout << x << " ";
+    for (int i = 0; i < n; i++) cout << a[i] << " ";
 }

@@ -1,16 +1,25 @@
 #include <bits/stdc++.h>
 using namespace std;
+
 int main() {
-    int n; string a, b; cin >> n;
-    map<string, string> orig; // текущий ник -> исходный
-    while (n--) {
-        cin >> a >> b;
-        string o = orig.count(a) ? orig[a] : a;
-        orig.erase(a);
-        orig[b] = o;
+    int n;
+    cin >> n;
+    map<string, string> origin; // current nickname -> original nickname
+    for (int i = 0; i < n; i++) {
+        string oldNick, newNick;
+        cin >> oldNick >> newNick;
+        string original = oldNick;
+        if (origin.count(oldNick)) { // oldNick was already a renamed nickname
+            original = origin[oldNick];
+            origin.erase(oldNick);
+        }
+        origin[newNick] = original;
     }
-    map<string, string> res; // исходный -> текущий, map сам сортирует
-    for (auto& [cur, o] : orig) res[o] = cur;
-    cout << res.size() << "\n";
-    for (auto& [o, cur] : res) cout << o << " " << cur << "\n";
+
+    // flip it: original -> current (map keeps the keys sorted)
+    map<string, string> ans;
+    for (auto p : origin) ans[p.second] = p.first;
+
+    cout << ans.size() << endl;
+    for (auto p : ans) cout << p.first << " " << p.second << endl;
 }

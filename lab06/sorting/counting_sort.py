@@ -1,4 +1,11 @@
-# Подсчёт: O(n + MAX). Только для небольших чисел (здесь 0..10^6).
-input(); c = [0] * 1000001
-for x in map(int, input().split()): c[x] += 1  # сколько раз встретилось x
-print(*[v for v in range(len(c)) for _ in range(c[v])])
+# Counting sort, O(n + MAX): works only for small numbers (here 0..1000000)
+n = int(input())
+cnt = [0] * 1000001
+for x in map(int, input().split()):
+    cnt[x] += 1  # how many times x appears
+
+result = []
+for v in range(1000001):
+    for _ in range(cnt[v]):
+        result.append(v)
+print(*result)
