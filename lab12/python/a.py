@@ -14,7 +14,8 @@ for k in range(n):
     dk = d[k]
     for i in range(n):
         dik = d[i][k]
-        d[i] = [min(x, dik + y) for x, y in zip(d[i], dk)]
+        # d[i][j] = min(d[i][j], d[i][k] + d[k][j]) for every j
+        d[i] = [x if x < dik + y else dik + y for x, y in zip(d[i], dk)]
     # the longest shortest path among the added vertices 0..k
     out.append(max(max(d[i][:k + 1]) for i in range(k + 1)))
 print("\n".join(map(str, out)))
