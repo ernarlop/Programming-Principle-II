@@ -1,14 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
-
-vector<int> ch[1001]; // ch[v] — сыновья вершины v
-int cnt[1001];        // cnt[d] — сколько вершин на уровне d
-
-void go(int v, int d) {
-    cnt[d]++;
-    for (int u : ch[v]) go(u, d + 1);
-}
-
+vector<int> ch[1001]; int cnt[1001]; // сыновья вершины, число вершин на уровне
+void go(int v, int d) { cnt[d]++; for (int u : ch[v]) go(u, d + 1); }
 int main() {
     int n, x, y, z;
     cin >> n;
